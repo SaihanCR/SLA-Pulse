@@ -1,14 +1,18 @@
 {
   "name": "back",
   "version": "1.0.0",
-  "main": "App.js",
+  "description": "SLA Pulse Backend - Node.js + Express + Supabase",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  
-"dependencies": {
-  "express": "^5.2.1"
-}
+  "main": "app.js",
 
+  "scripts": {
+    "dev": "node --watch app.js",
+    "start": "node app.js"
+  },
+
+  "dependencies": {
+    "express": "^5.2.1",
+    "@supabase/supabase-js": "^2.43.0",
+    "dotenv": "^16.4.5"
+  }
 }

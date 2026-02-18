@@ -74,7 +74,33 @@ app.get("/api/:table", async (req, res) => {
   }
 })
 
+// const PORT = process.env.PORT || 3000
+// app.listen(PORT, () => {
+//   console.log(`API running on http://localhost:${PORT}/`)
+// })
+
 const PORT = process.env.PORT || 3000
+
 app.listen(PORT, () => {
-  console.log(`API running on http://localhost:${PORT}`)
+  console.log("\n=======================================")
+  console.log(`API running on http://localhost:${PORT}/`)
+  console.log("=======================================\n")
+
+  console.log(`Base URL:`)
+  console.log(`   http://localhost:${PORT}/` )
+  console.log("   = Punto base del backend SLA Pulse\n")
+
+  console.log(`Health Check:`)
+  console.log(`   http://localhost:${PORT}/health`)
+  console.log("   = Verifica que la API esté funcionando\n")
+
+  console.log(`Dynamic Table Endpoint:`)
+  console.log(`   http://localhost:${PORT}/api/:table`)
+  console.log("   = Consulta cualquier tabla permitida (whitelist)\n")
+
+  console.log("=======================================\n")
 })
+
+
+
+
