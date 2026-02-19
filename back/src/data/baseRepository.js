@@ -1,32 +1,33 @@
-// Repositorio base reutilizable para cualquier tabla permitida.
-// Implementa operaciones CRUD genéricas utilizando Supabase.
-// Este patrón desacopla la capa de acceso a datos del resto de la aplicación.
+// Repositorio base reutilizable para cualquier tabla.
+// Implementa operaciones CRUD genéricas con Supabase.
+// Sirve como base para repositorios específicos (tickets, services, roles, etc.).
 
-import { supabaseAdmin } from "../config/supabaseClient.js";
+import { supabase } from "../config/supabase.js";
 
 export default class BaseRepository {
   constructor(tableName) {
-    // Nombre de la tabla asociada
     this.table = tableName;
-
-    // Cliente administrativo de Supabase
-    this.supabase = supabaseAdmin;
+    this.supabase = supabase;
   }
 
   // Obtiene múltiples registros con soporte para:
-  // - filtros dinámicos
+  // - filtros dinámicos (eq)
   // - paginación (limit, offset)
-  // - ordenamiento
+  // - ordenamiento (orderBy, ascending)
+  // - count total (para paginación real en frontend)
   async findAll({
-    limit = 100,
+    limit = 50,
     offset = 0,
     orderBy = null,
     ascending = true,
     filters = {},
+    select = "*",
   } = {}) {
-    let query = this.supabase.from(this.table).select("*", { count: "exact" });
+    let query = this.supabase
+      .from(this.table)
+      .select(select, { count: "exact" });
 
-    // Aplicación dinámica de filtros tipo igualdad
+    // Aplicación de filtros simples tipo igualdad
     for (const [field, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== "") {
         query = query.eq(field, value);
@@ -43,34 +44,25 @@ export default class BaseRepository {
 
     const { data, error, count } = await query;
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    return {
-      data,
-      count,
-      limit,
-      offset,
-    };
+    return { data, count, limit, offset };
   }
 
-  // Obtiene un registro por su ID
-  async findById(id, idColumn = "id") {
+  // Obtiene un registro por ID (PK configurable)
+  async findById(id, idColumn = "id", select = "*") {
     const { data, error } = await this.supabase
       .from(this.table)
-      .select("*")
+      .select(select)
       .eq(idColumn, id)
       .single();
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   }
 
-  // Inserta un nuevo registro
+  // Inserta un registro
   async insert(payload) {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -78,9 +70,7 @@ export default class BaseRepository {
       .select()
       .single();
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   }
@@ -94,9 +84,7 @@ export default class BaseRepository {
       .select()
       .single();
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   }
@@ -110,9 +98,7 @@ export default class BaseRepository {
       .select()
       .single();
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return data;
   }

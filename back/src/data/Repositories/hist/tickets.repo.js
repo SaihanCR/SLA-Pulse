@@ -1,45 +1,66 @@
 // Repositorio específico para la tabla "tickets".
-// Extiende BaseRepository para heredar operaciones CRUD genéricas,
-// pero permite agregar métodos especializados del dominio Tickets.
+// Pertenece a la capa HIST y almacena los tickets con sus estados y departamentos.
+// Aquí solo va acceso a datos (DAL). No incluye lógica HTTP ni endpoints.
 
 import BaseRepository from "../../baseRepository.js";
 
 export default class TicketsRepository extends BaseRepository {
   constructor() {
-    // Se inicializa el repositorio con el nombre de la tabla
     super("tickets");
   }
 
   // Obtiene tickets por service_id
-  // Útil para análisis por servicio dentro del SLA Pulse
-  async findByServiceId(serviceId) {
-    const { data, error } = await this.client()
-      .select("*")
-      .eq("service_id", serviceId);
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
+  async findByServiceId(serviceId, options = {}) {
+    return this.findAll({
+      ...options,
+      filters: { ...(options.filters || {}), service_id: serviceId },
+    });
   }
 
-  // Obtiene tickets por status (ej: open, closed, breached)
-  async findByStatus(status) {
-    const { data, error } = await this.client()
-      .select("*")
-      .eq("status", status);
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
+  // Obtiene tickets por status (ej: open, resolved, closed)
+  async findByStatus(status, options = {}) {
+    return this.findAll({
+      ...options,
+      filters: { ...(options.filters || {}), status },
+    });
   }
 
-  // Método interno para mantener consistencia con el BaseRepository
-  // Permite reutilizar la conexión sin duplicar lógica
-  client() {
-    return this.supabase.from(this.table);
+  // Obtiene tickets por departamento responsable
+  async findByResponsibleDepartment(departmentId, options = {}) {
+    return this.findAll({
+      ...options,
+      filters: {
+        ...(options.filters || {}),
+        responsible_department_id: departmentId,
+      },
+    });
+  }
+
+  // Obtiene tickets por departamento solicitante
+  async findByRequesterDepartment(departmentId, options = {}) {
+    return this.findAll({
+      ...options,
+      filters: {
+        ...(options.filters || {}),
+        requester_department_id: departmentId,
+      },
+    });
+  }
+
+  // Marca un ticket como resuelto y registra resolved_at
+  // Nota: por ahora no validamos reglas de transición (eso iría en Service)
+  async markResolved(ticketId, resolvedAt = new Date().toISOString()) {
+    return this.update(ticketId, {
+      status: "resolved",
+      resolved_at: resolvedAt,
+    });
+  }
+
+  // Marca un ticket como cerrado y registra closed_at
+  async markClosed(ticketId, closedAt = new Date().toISOString()) {
+    return this.update(ticketId, {
+      status: "closed",
+      closed_at: closedAt,
+    });
   }
 }
