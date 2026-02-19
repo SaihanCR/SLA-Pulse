@@ -1,21 +1,25 @@
-// Repositorio específico para la tabla "roles".
-// Pertenece a la capa SECURITY y almacena el catálogo de roles del sistema.
+// Repositorio específico para la tabla "user_roles".
+// Pertenece a la capa SECURITY y almacena la asignación de rol a cada usuario.
+// Regla actual: 1 usuario = 1 rol.
+//
 // Aquí solo va acceso a datos (DAL). No incluye lógica HTTP ni endpoints.
 
 import BaseRepository from "../../baseRepository.js";
 
-export default class RolesRepository extends BaseRepository {
+export default class UserRolesRepository extends BaseRepository {
   constructor() {
-    super("roles");
+    super("user_roles");
   }
 
-  // Obtiene un rol por nombre exacto (ej: admin, responsable, solicitante).
-  // Ajusta "name" si tu columna real tiene otro nombre.
-  async findByName(name) {
+  // Obtiene el rol asignado a un usuario por user_id
+  async findByUserId(userId) {
     const { data, error } = await this.supabase
       .from(this.table)
-      .select("*")
-      .eq("name", name)
+      .select(`
+        *,
+        roles (*)
+      `)
+      .eq("user_id", userId)
       .single();
 
     if (error) throw error;
@@ -23,28 +27,23 @@ export default class RolesRepository extends BaseRepository {
     return data;
   }
 
-  // Busca roles por nombre parcial (búsqueda flexible).
-  async searchByName(name, { limit = 50, offset = 0 } = {}) {
-    const { data, error, count } = await this.supabase
-      .from(this.table)
-      .select("*", { count: "exact" })
-      .ilike("name", `%${name}%`)
-      .range(offset, offset + limit - 1);
-
-    if (error) throw error;
-
-    return { data, count, limit, offset };
+  // Obtiene usuarios por role_id
+  async findByRoleId(roleId, options = {}) {
+    return this.findAll({
+      ...options,
+      filters: {
+        ...(options.filters || {}),
+        role_id: roleId,
+      },
+    });
   }
 
-  // Obtiene todos los roles ordenados por nombre (útil para selects en frontend)
-  async findAllOrdered() {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select("*")
-      .order("name", { ascending: true });
-
-    if (error) throw error;
-
-    return data;
+  // Asigna o cambia el rol de un usuario
+  // Nota: no validamos aquí si ya existe uno (eso sería lógica de Service)
+  async assignRole(userId, roleId) {
+    return this.insert({
+      user_id: userId,
+      role_id: roleId,
+    });
   }
 }

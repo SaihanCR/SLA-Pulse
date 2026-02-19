@@ -1,6 +1,6 @@
 // Repositorio base reutilizable para cualquier tabla.
-// Implementa operaciones CRUD genéricas utilizando Supabase.
-// Esta clase es la base de todos los repositorios del sistema.
+// Implementa operaciones CRUD genéricas con Supabase.
+// Sirve como base para repositorios específicos (tickets, services, roles, etc.).
 
 import { supabase } from "../config/supabase.js";
 
@@ -10,9 +10,11 @@ export default class BaseRepository {
     this.supabase = supabase;
   }
 
-  // ==============================
-  // LIST (con filtros y paginación)
-  // ==============================
+  // Obtiene múltiples registros con soporte para:
+  // - filtros dinámicos (eq)
+  // - paginación (limit, offset)
+  // - ordenamiento (orderBy, ascending)
+  // - count total (para paginación real en frontend)
   async findAll({
     limit = 50,
     offset = 0,
@@ -25,36 +27,29 @@ export default class BaseRepository {
       .from(this.table)
       .select(select, { count: "exact" });
 
-    // Filtros simples tipo igualdad
+    // Aplicación de filtros simples tipo igualdad
     for (const [field, value] of Object.entries(filters)) {
       if (value !== undefined && value !== null && value !== "") {
         query = query.eq(field, value);
       }
     }
 
-    // Ordenamiento
+    // Ordenamiento opcional
     if (orderBy) {
       query = query.order(orderBy, { ascending });
     }
 
-    // Paginación
+    // Paginación usando range
     query = query.range(offset, offset + limit - 1);
 
     const { data, error, count } = await query;
 
     if (error) throw error;
 
-    return {
-      data,
-      count,
-      limit,
-      offset,
-    };
+    return { data, count, limit, offset };
   }
 
-  // ==============================
-  // GET BY ID
-  // ==============================
+  // Obtiene un registro por ID (PK configurable)
   async findById(id, idColumn = "id", select = "*") {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -67,9 +62,7 @@ export default class BaseRepository {
     return data;
   }
 
-  // ==============================
-  // CREATE
-  // ==============================
+  // Inserta un registro
   async insert(payload) {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -82,9 +75,7 @@ export default class BaseRepository {
     return data;
   }
 
-  // ==============================
-  // UPDATE
-  // ==============================
+  // Actualiza un registro por ID
   async update(id, payload, idColumn = "id") {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -98,9 +89,7 @@ export default class BaseRepository {
     return data;
   }
 
-  // ==============================
-  // DELETE
-  // ==============================
+  // Elimina un registro por ID
   async remove(id, idColumn = "id") {
     const { data, error } = await this.supabase
       .from(this.table)
