@@ -1,53 +1,13 @@
-/*
-Routes de Departments
+// routes/departments.routes.js
+import { Router } from 'express';
+import departmentsController from '../controllers/departments.controller.js';
 
-Responsabilidades:
-- Definir endpoints HTTP
-- Mapear rutas → controllers
+const router = Router();
 
-NO contiene lógica de negocio
-*/
-
-import express from "express";
-
-import {
-  getDepartments,
-  getDepartmentById,
-  createDepartment,
-  updateDepartment,
-  deleteDepartment
-} from "../controllers/departments.controller.js";
-
-const router = express.Router();
-
-/*
-  GET /api/departments
-  Lista todos los departamentos
-*/
-router.get("/", getDepartments);
-
-/*
-  GET /api/departments/:id
-  Obtiene un departamento por ID
-*/
-router.get("/:id", getDepartmentById);
-
-/*
-  POST /api/departments
-  Crea un nuevo departamento
-*/
-router.post("/", createDepartment);
-
-/*
-  PUT /api/departments/:id
-  Actualiza un departamento
-*/
-router.put("/:id", updateDepartment);
-
-/*
-  DELETE /api/departments/:id
-  Elimina un departamento
-*/
-router.delete("/:id", deleteDepartment);
+router.get('/',       departmentsController.getAll.bind(departmentsController));
+router.get('/:id',    departmentsController.getById.bind(departmentsController));
+router.post('/',      departmentsController.create.bind(departmentsController));
+router.put('/:id',    departmentsController.update.bind(departmentsController));
+router.delete('/:id', departmentsController.delete.bind(departmentsController));
 
 export default router;
