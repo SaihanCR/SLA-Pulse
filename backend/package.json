@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "node App.js",
-    "start": "node App.js",
+    "start": "node ./App.js",
     "test:data": "node src/tests/repositories/repositories.data.test.js",
     "test:structure": "node src/tests/repositories/repositories.structure.test.js"
   },

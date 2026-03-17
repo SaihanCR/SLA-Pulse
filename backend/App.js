@@ -1,5 +1,6 @@
 import express from 'express';
 import './src/config/supabase.js';
+import departmentRouter from './src/routes/departments.routes.js'
 
 const app = express();
 
@@ -8,6 +9,10 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('API SLA Pulse funcionando...');
 });
+
+app.use('/departments', departmentRouter)
+
+
 
 const PORT = 3000;
 
