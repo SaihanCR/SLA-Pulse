@@ -1,36 +1,48 @@
-/* 
-Sayjan, Francis les deje la estrucura base. ya ustedes le agregan la logica de negocio
-
-A estructura me refiero que estos llama al repositorio con diferente llamadas
-
-para mas info.. haz una rama del chat: Arquitectura Backend SLA Pulse
-*/
-
-import departmentsRepository from '../repositories/departments.repository.js';
+import departmentsRepository from "../repositories/departments.repository.js";
 
 class DepartmentsService {
-  async getAllDepartments() {
-    // Obtiene todos los departamentos
-    return await departmentsRepository.getAll();
+
+  async getAllDepartments(options = {}) {
+    return await departmentsRepository.getAll(options);
   }
 
   async getDepartmentById(departmentId) {
-    // Obtiene un departamento por su ID
+    if (!departmentId) {
+      throw new Error("Department ID is required");
+    }
+
     return await departmentsRepository.getById(departmentId);
   }
 
   async createDepartment(departmentData) {
-    // Crea un nuevo departamento
+    if (!departmentData) {
+      throw new Error("Department data is required");
+    }
+
+    if (!departmentData.name) {
+      throw new Error("Department name is required");
+    }
+
     return await departmentsRepository.create(departmentData);
   }
 
   async updateDepartment(departmentId, departmentData) {
-    // Actualiza un departamento existente
+    if (!departmentId) {
+      throw new Error("Department ID is required");
+    }
+
+    if (!departmentData) {
+      throw new Error("Department data is required");
+    }
+
     return await departmentsRepository.update(departmentId, departmentData);
   }
 
   async deleteDepartment(departmentId) {
-    // Elimina un departamento por su ID
+    if (!departmentId) {
+      throw new Error("Department ID is required");
+    }
+
     return await departmentsRepository.delete(departmentId);
   }
 }
