@@ -1,21 +1,24 @@
 import express from 'express';
 import './src/config/supabase.js';
-import departmentRouter from './src/routes/departments.routes.js'
 
 import departmentsRoutes from "./src/routes/departments.routes.js";
+import companiesRoutes from "./src/routes/companies.routes.js"
+import slasRoutes from "./src/routes/slas.routes.js"
 
 const app = express();
 
 app.use(express.json());
 
-// 🔥 REGISTRAR RUTA
+//REGISTRAR RUTAS
 app.use("/api/departments", departmentsRoutes);
+app.use("/api/companies", companiesRoutes);
+app.use("/api/slas", slasRoutes)
 
 app.get('/', (req, res) => {
   res.send('API SLA Pulse funcionando...');
 });
 
-app.use('/departments', departmentRouter)
+
 
 
 
@@ -27,6 +30,7 @@ app.listen(PORT, () => {
   console.log("   Punto base del backend SLA Pulse\n")
 
   console.log(`Endpoints disponibles:`)
+  console.log(`   Companies  http://localhost:${PORT}/api/companies`)
   console.log(`   Departments  http://localhost:${PORT}/api/departments`)
+  console.log(`   SLAs  http://localhost:${PORT}/api/slas`)
 });
- 
