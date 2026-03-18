@@ -39,3 +39,4 @@ async function testRepositoriesData() {
 }
 
 testRepositoriesData();
+// run =  npm run test:data
