@@ -19,7 +19,7 @@ class DepartmentsService {
       throw new Error("Department data is required");
     }
 
-    if (!departmentData.name) {
+    if (!departmentData.department_name) {
       throw new Error("Department name is required");
     }
 

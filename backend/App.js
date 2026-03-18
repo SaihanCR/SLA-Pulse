@@ -27,6 +27,6 @@ app.listen(PORT, () => {
   console.log("   Punto base del backend SLA Pulse\n")
 
   console.log(`Endpoints disponibles:`)
-  console.log(`   GET  http://localhost:${PORT}/api/departments`)
+  console.log(`   Departments  http://localhost:${PORT}/api/departments`)
 });
  
