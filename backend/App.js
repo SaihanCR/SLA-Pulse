@@ -2,9 +2,10 @@ import express from 'express';
 import './src/config/supabase.js';
 
 import departmentsRoutes from "./src/routes/departments.routes.js";
-import companiesRoutes from "./src/routes/companies.routes.js"
-import slasRoutes from "./src/routes/slas.routes.js"
-import prioritiesRoutes from "./src/routes/priorities.routes.js"
+import companiesRoutes from "./src/routes/companies.routes.js";
+import slasRoutes from "./src/routes/slas.routes.js";
+import prioritiesRoutes from "./src/routes/priorities.routes.js";
+import ticketStatusesRoutes from "./src/routes/ticketStatuses.routes.js"
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use("/api/departments", departmentsRoutes);
 app.use("/api/companies", companiesRoutes);
 app.use("/api/slas", slasRoutes);
 app.use("/api/priorities", prioritiesRoutes);
+app.use("/api/ticketstatuses", ticketStatusesRoutes);
 
 app.get('/', (req, res) => {
   res.send('API SLA Pulse funcionando...');
@@ -36,4 +38,5 @@ app.listen(PORT, () => {
   console.log(`   Departments  http://localhost:${PORT}/api/departments`)
   console.log(`   SLAs  http://localhost:${PORT}/api/slas`)
   console.log(`   Priorities  http://localhost:${PORT}/api/priorities`)
+  console.log(`   ticketStatuses  http://localhost:${PORT}/api/ticketstatuses`)
 });
