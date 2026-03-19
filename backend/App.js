@@ -19,7 +19,7 @@ app.use("/api/slas", slasRoutes);
 app.use("/api/priorities", prioritiesRoutes);
 
 app.get('/', (req, res) => {
-  res.send('API SLA Pulse funcionando...');
+  res.send('API en funcionamiento... Se a conectado correctamente con Supabase');
 });
 
 
