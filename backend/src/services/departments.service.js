@@ -45,6 +45,14 @@ class DepartmentsService {
 
     return await departmentsRepository.delete(departmentId);
   }
+
+  async searchDepartmentsByName(name) {
+    if (!name) {
+      throw new Error("Department name is required");
+    }
+
+    return await departmentsRepository.findByName(name);
+  }
 }
 
 export default new DepartmentsService();

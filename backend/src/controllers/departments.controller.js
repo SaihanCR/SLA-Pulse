@@ -1,5 +1,6 @@
 // controllers/departments.controller.js
 import departmentsService from '../services/departments.service.js';
+console.log(departmentsService);//testing
 
 class DepartmentsController {
   async getAll(req, res) {
@@ -44,6 +45,18 @@ class DepartmentsController {
       res.status(204).send();
     } catch (error) {
       res.status(404).json({ message: error.message });
+    }
+  }
+
+  async searchByName(req, res) {
+    try {
+      const { department_name } = req.query;
+
+      const data = await departmentsService.searchDepartmentsByName(department_name);
+
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
   }
 }
