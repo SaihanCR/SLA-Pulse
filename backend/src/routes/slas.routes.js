@@ -4,6 +4,7 @@ import slasController from "../controllers/slas.controller.js";
 const router = Router();
 
 router.get("/", slasController.getAll);
+router.get('/by-department', slasController.getByDepartment.bind(slasController)); //http://localhost:3000/api/slas/by-department?department_id=UUID
 router.get("/:id", slasController.getById);
 router.post("/", slasController.create);
 router.put("/:id", slasController.update);
