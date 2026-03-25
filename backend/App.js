@@ -6,6 +6,7 @@ import companiesRoutes from "./src/routes/companies.routes.js"
 import slasRoutes from "./src/routes/slas.routes.js"
 import prioritiesRoutes from "./src/routes/priorities.routes.js"
 import rolesRoutes from "./src/routes/roles.routes.js"
+import userRoutes from "./src/routes/users.routes.js"
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/api/roles", rolesRoutes);
 app.use("/api/companies", companiesRoutes);
 app.use("/api/slas", slasRoutes);
 app.use("/api/priorities", prioritiesRoutes);
+app.use("/api/users", userRoutes);
 
 app.get('/', (req, res) => {
   res.send('API SLA Pulse funcionando...');
@@ -39,4 +41,5 @@ app.listen(PORT, () => {
   console.log(`   SLAs  http://localhost:${PORT}/api/slas`)
   console.log(`   Priorities  http://localhost:${PORT}/api/priorities`)
   console.log(`   Roles  http://localhost:${PORT}/api/roles`)
+  console.log(`   Roles  http://localhost:${PORT}/api/users`)
 });
