@@ -74,4 +74,4 @@ async function testRepositories() {
 }
 
 testRepositories();
-// run = npm run test:data
+// run = npm run test:structure
