@@ -46,6 +46,19 @@ class SlasController {
       res.status(404).json({ message: error.message });
     }
   }
+
+
+  async getByDepartment(req, res) {
+    try {
+      const { department_id } = req.query;
+
+      const data = await slasService.getSlasByDepartment(department_id);
+
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
 }
 
 export default new SlasController();

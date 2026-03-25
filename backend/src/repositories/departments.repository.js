@@ -1,10 +1,23 @@
 import BaseRepository from './baseRepository.js';
+import supabase from '../config/supabase.js';
 
 class DepartmentsRepository extends BaseRepository {
   constructor() {
-    // Repositorio para la tabla departments
-    // Ajusta el nombre del campo PK si en tu tabla no es "id"
+    // Tabla y primary key
     super('departments', 'department_id');
+  }
+
+  async findByName(name) {
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select('*')
+      .ilike('department_name', `%${name}%`);
+
+    if (error) {
+      throw new Error(`Error al buscar departamentos: ${error.message}`);
+    }
+
+    return data;
   }
 }
 
