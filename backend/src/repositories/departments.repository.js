@@ -9,7 +9,7 @@ class DepartmentsRepository extends BaseRepository {
 
   async findByName(name) {
     const { data, error } = await supabase
-      .from(this.tableName) // 👈 corregido
+      .from(this.tableName)
       .select('*')
       .ilike('department_name', `%${name}%`);
 
