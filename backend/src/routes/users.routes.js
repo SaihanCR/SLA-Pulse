@@ -10,4 +10,5 @@ router.put('/:id',     usersController.update.bind(usersController))
 router.delete('/:id',      usersController.delete.bind(usersController))
 
 
+
 export default router
