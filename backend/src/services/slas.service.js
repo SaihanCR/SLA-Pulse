@@ -57,6 +57,14 @@ class SlasService {
 
     return await slasRepository.delete(slaId);
   }
+
+  async getSlasByDepartment(departmentId) {
+    if (!departmentId) {
+      throw new Error("Department ID is required");
+    }
+
+    return await slasRepository.findByDepartment(departmentId);
+  }
 }
 
 export default new SlasService();
