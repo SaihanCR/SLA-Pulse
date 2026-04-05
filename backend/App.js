@@ -9,6 +9,7 @@ import rolesRoutes from "./src/routes/roles.routes.js"
 import userRoutes from "./src/routes/users.routes.js"
 import ticketsRoutes from "./src/routes/tickets.routes.js";
 import authRoutes from "./src/routes/auth.routes.js"
+import alertsRoutes from "./src/routes/alerts.routes.js"
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/priorities", prioritiesRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tickets", ticketsRoutes);
 app.use("/api/auth", authRoutes)
+app.use("/api/alerts", alertsRoutes)
 
 app.get('/', (req, res) => {
   res.send('API en funcionamiento... Se a conectado correctamente con Supabase');
@@ -48,4 +50,5 @@ app.listen(PORT, () => {
   console.log(`   Usuarios  http://localhost:${PORT}/api/users`)
   console.log(`   Tickets  http://localhost:${PORT}/api/tickets`)
   console.log(`   Auth  http://localhost:${PORT}/api/auth`)
+  console.log(`   Alerts  http://localhost:${PORT}/api/alerts`)
 });
