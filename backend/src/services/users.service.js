@@ -23,8 +23,7 @@ class UserService {
         const { company_id, role_id, department_id, first_name, last_name, job_title, is_active, user_email, user_psw } = userData
 
         // creamos el usuario en supabase auth
-
-        const data = await authService.signUp({user_email, user_psw})
+        const data = await authService.signUp({ user_email, user_psw })
 
         // creamos el usuario en la tabla users con el id del auth user
         const payload = {
@@ -53,7 +52,24 @@ class UserService {
 
         if (userData.first_name) {
             userData.first_name = userData.first_name.toUpperCase()
+            userData.int_cod_user = await this.genreateUserCode(userData.first_name) // si se actualiza el nombre, generamos un nuevo codigo unico para el usuario
         }
+
+        // actualizar el email y contraseña en supabase auth si se proporcionan
+        if (userData.user_email || userData.user_psw) {
+            const authData = {}
+            if (userData.user_email) {
+                authData.email = userData.user_email
+            }
+            if (userData.user_psw) {
+                authData.password = userData.user_psw
+            }
+            await authService.updateUser(userid, authData)
+        }
+
+        // eliminamos los campos de email y contraseña del payload para no actualizar esos campos en la tabla users
+        delete userData.user_email
+        delete userData.user_psw
 
         return await userRepository.update(userid, userData)
     }
@@ -62,9 +78,9 @@ class UserService {
         if (!userId) {
             throw new Error('User ID required')
         }
-
-        return await userRepository.delete(userId);
-    }   
+        await authService.logOut() // cerramos la sesión del usuario antes de eliminarlo
+        return await authService.deleteUser(userId) // eliminamos el usuario de supabase auth
+    }
 
     //Genera un código único para el usuario basado en su nombre
     async genreateUserCode(userName) {
