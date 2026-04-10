@@ -10,6 +10,8 @@ import userRoutes from "./src/routes/users.routes.js"
 import ticketsRoutes from "./src/routes/tickets.routes.js";
 import authRoutes from "./src/routes/auth.routes.js"
 import alertsRoutes from "./src/routes/alerts.routes.js"
+import aiRoutes from "./src/routes/ai.routes.js";
+
 
 const app = express();
 
@@ -23,8 +25,9 @@ app.use("/api/slas", slasRoutes);
 app.use("/api/priorities", prioritiesRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tickets", ticketsRoutes);
-app.use("/api/auth", authRoutes)
-app.use("/api/alerts", alertsRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/api/alerts", alertsRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get('/', (req, res) => {
   res.send('API en funcionamiento... Se a conectado correctamente con Supabase');
@@ -51,4 +54,5 @@ app.listen(PORT, () => {
   console.log(`   Tickets  http://localhost:${PORT}/api/tickets`)
   console.log(`   Auth  http://localhost:${PORT}/api/auth`)
   console.log(`   Alerts  http://localhost:${PORT}/api/alerts`)
+  console.log(`   AI Chat  http://localhost:${PORT}/api/ai/chat`)
 });
