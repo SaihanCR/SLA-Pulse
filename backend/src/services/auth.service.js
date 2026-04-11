@@ -1,6 +1,6 @@
 import supabase from '../config/supabase.js';
 
-class authService{
+class authService {
 
     async signUp(signUpData) {
         if (!signUpData) {
@@ -54,6 +54,29 @@ class authService{
         }
 
         return { message: 'Logged out successfully' }
+    }
+
+    async updateUser(userid, updateData) {
+        if (!userid) {
+            throw new Error('User ID required')
+        }
+        if (!updateData) {
+            throw new Error('Update data required')
+        }
+        const { error } = await supabase.auth.admin.updateUserById(userid, updateData)
+        if (error) {
+            throw new Error('Error updating user: ' + error.message)
+        }
+    }
+
+    async deleteUser(userid) {
+        if (!userid) {
+            throw new Error('User ID required')
+        }
+        const { error } = await supabase.auth.admin.deleteUser(userid)
+        if (error) {
+            throw new Error('Error deleting user: ' + error.message)
+        }
     }
 
 }
