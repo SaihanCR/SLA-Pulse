@@ -13,10 +13,6 @@ const Layout = ({ children }) => {
             Companies
           </Link>
 
-          <Link to="/departments" className="hover:text-purple-400">
-            Departments
-          </Link>
-
           <Link to="/slas" className="hover:text-purple-400">
             SLAs
           </Link>
