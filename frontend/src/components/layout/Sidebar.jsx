@@ -15,11 +15,6 @@ const menuItems = [
     icon: <Building2 size={18} />,
   },
   {
-    name: "Departments",
-    path: "/departments",
-    icon: <LayoutDashboard size={18} />,
-  },
-  {
     name: "SLAs",
     path: "/slas",
     icon: <Layers size={18} />,
