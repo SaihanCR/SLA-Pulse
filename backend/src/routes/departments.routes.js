@@ -5,6 +5,7 @@ import departmentsController from '../controllers/departments.controller.js';
 const router = Router();
 
 router.get('/',       departmentsController.getAll.bind(departmentsController));
+router.get("/by-company", departmentsController.getByCompany.bind(departmentsController));
 router.get("/search", departmentsController.searchByName.bind(departmentsController));
 router.get('/:id',    departmentsController.getById.bind(departmentsController));
 router.post('/',      departmentsController.create.bind(departmentsController));

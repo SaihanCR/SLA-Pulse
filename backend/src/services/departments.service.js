@@ -91,6 +91,13 @@ class DepartmentsService {
 
     return await departmentsRepository.findByName(name);
   }
+  async getDepartmentsByCompany(companyId) {
+  if (!companyId) {
+    throw new Error("Company ID is required");
+  }
+
+  return await departmentsRepository.findByCompanyId(companyId);
+}
 }
 
 export default new DepartmentsService();

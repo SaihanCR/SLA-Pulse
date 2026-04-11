@@ -1,19 +1,45 @@
-import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Navbar from "./Navbar";
+import { Link } from "react-router-dom";
 
-const Layout = () => {
+const Layout = ({ children }) => {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
+    <div className="flex min-h-screen bg-gray-100">
 
-      <div className="flex-1 flex flex-col">
-        <Navbar />
+      {/* SIDEBAR */}
+      <aside className="w-64 bg-gray-900 text-white p-5">
+        <h1 className="text-xl font-bold mb-6">SLA Pulse</h1>
 
-        <main className="p-6 bg-gray-100 flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+        <nav className="flex flex-col gap-3">
+          <Link to="/companies" className="hover:text-purple-400">
+            Companies
+          </Link>
+
+          <Link to="/departments" className="hover:text-purple-400">
+            Departments
+          </Link>
+
+          <Link to="/slas" className="hover:text-purple-400">
+            SLAs
+          </Link>
+
+          <Link to="/users" className="hover:text-purple-400">
+            Users
+          </Link>
+
+          <Link to="/roles" className="hover:text-purple-400">
+            Roles
+          </Link>
+
+          <Link to="/tickets" className="hover:text-purple-400">
+            Tickets
+          </Link>
+        </nav>
+      </aside>
+
+      {/* CONTENT */}
+      <main className="flex-1 p-6">
+        {children}
+      </main>
+
     </div>
   );
 };

@@ -59,6 +59,18 @@ class DepartmentsController {
       res.status(400).json({ message: error.message });
     }
   }
+
+  async getByCompany(req, res) {
+  try {
+    const { company_id } = req.query;
+
+    const data = await departmentsService.getDepartmentsByCompany(company_id);
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
 }
 
 export default new DepartmentsController();

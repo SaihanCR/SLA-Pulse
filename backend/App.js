@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from "cors";
 import './src/config/supabase.js';
 
 import departmentsRoutes from "./src/routes/departments.routes.js";
@@ -14,6 +15,7 @@ import aiRoutes from "./src/routes/ai.routes.js";
 
 
 const app = express();
+app.use(cors());
 
 app.use(express.json());
 
