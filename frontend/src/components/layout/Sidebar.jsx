@@ -5,9 +5,15 @@ import {
   Users,
   Shield,
   Layers,
+  Ticket,
 } from "lucide-react";
 
 const menuItems = [
+  {
+    name: "Companies",
+    path: "/companies",
+    icon: <Building2 size={18} />,
+  },
   {
     name: "Departments",
     path: "/departments",
@@ -19,11 +25,6 @@ const menuItems = [
     icon: <Layers size={18} />,
   },
   {
-    name: "Companies",
-    path: "/companies",
-    icon: <Building2 size={18} />,
-  },
-  {
     name: "Users",
     path: "/users",
     icon: <Users size={18} />,
@@ -32,6 +33,11 @@ const menuItems = [
     name: "Roles",
     path: "/roles",
     icon: <Shield size={18} />,
+  },
+  {
+    name: "Tickets",
+    path: "/tickets",
+    icon: <Ticket size={18} />,
   },
 ];
 

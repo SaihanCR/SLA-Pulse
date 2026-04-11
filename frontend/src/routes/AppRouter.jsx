@@ -6,6 +6,7 @@ import SlasPage from "../pages/SlasPage";
 import CompaniesPage from "../pages/CompaniesPage";
 import UsersPage from "../pages/UsersPage";
 import RolesPage from "../pages/RolesPage";
+import TicketsPage from "../pages/TicketsPage";
 
 const AppRouter = () => {
   return (
@@ -18,6 +19,7 @@ const AppRouter = () => {
           <Route path="/companies" element={<CompaniesPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<RolesPage />} />
+          <Route path="/tickets" element={<TicketsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -19,6 +19,19 @@ class DepartmentsRepository extends BaseRepository {
 
     return data;
   }
+
+  async findByCompanyId(companyId) {
+  const { data, error } = await supabase
+    .from(this.tableName)
+    .select("*")
+    .eq("company_id", companyId);
+
+  if (error) {
+    throw new Error(`Error al buscar departamentos por compañía: ${error.message}`);
+  }
+
+  return data;
+}
 }
 
 export default new DepartmentsRepository();
