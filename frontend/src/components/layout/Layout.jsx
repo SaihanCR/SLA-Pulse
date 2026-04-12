@@ -1,10 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
-
-      {/* SIDEBAR */}
       <aside className="w-64 bg-gray-900 text-white p-5">
         <h1 className="text-xl font-bold mb-6">SLA Pulse</h1>
 
@@ -31,11 +29,9 @@ const Layout = ({ children }) => {
         </nav>
       </aside>
 
-      {/* CONTENT */}
       <main className="flex-1 p-6">
-        {children}
+        <Outlet />
       </main>
-
     </div>
   );
 };

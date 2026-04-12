@@ -1,17 +1,7 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout/Layout";
-import CompaniesPage from "./pages/CompaniesPage";
+import AppRouter from "./routes/AppRouter";
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/companies" element={<CompaniesPage />} />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
-  );
+  return <AppRouter />;
 }
 
 export default App;

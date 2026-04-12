@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "../components/layout/Layout";
+import Layout from "../components/Layout/Layout";
 
 import DepartmentsPage from "../pages/DepartmentsPage";
 import SlasPage from "../pages/SlasPage";
@@ -12,14 +12,14 @@ const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/departments" element={<DepartmentsPage />} />
-          <Route path="/" element={<DepartmentsPage />} />
-          <Route path="/slas" element={<SlasPage />} />
-          <Route path="/companies" element={<CompaniesPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/roles" element={<RolesPage />} />
-          <Route path="/tickets" element={<TicketsPage />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<DepartmentsPage />} />
+          <Route path="departments" element={<DepartmentsPage />} />
+          <Route path="slas" element={<SlasPage />} />
+          <Route path="companies" element={<CompaniesPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="roles" element={<RolesPage />} />
+          <Route path="tickets" element={<TicketsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
