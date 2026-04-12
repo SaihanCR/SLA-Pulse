@@ -1,37 +1,20 @@
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import Sidebar from "../Layout/Sidebar";
 
 const Layout = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <aside className="w-64 bg-gray-900 text-white p-5">
-        <h1 className="text-xl font-bold mb-6">SLA Pulse</h1>
+    <div className="min-h-screen bg-gray-100 text-gray-800">
+      <div className="flex min-h-screen">
+        <Sidebar />
 
-        <nav className="flex flex-col gap-3">
-          <Link to="/companies" className="hover:text-purple-400">
-            Companies
-          </Link>
-
-          <Link to="/slas" className="hover:text-purple-400">
-            SLAs
-          </Link>
-
-          <Link to="/users" className="hover:text-purple-400">
-            Users
-          </Link>
-
-          <Link to="/roles" className="hover:text-purple-400">
-            Roles
-          </Link>
-
-          <Link to="/tickets" className="hover:text-purple-400">
-            Tickets
-          </Link>
-        </nav>
-      </aside>
-
-      <main className="flex-1 p-6">
-        <Outlet />
-      </main>
+        <main className="flex-1 overflow-x-auto bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200">
+          <div className="min-h-screen p-6 md:p-8">
+            <div className="mx-auto w-full max-w-[1600px]">
+              <Outlet />
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
