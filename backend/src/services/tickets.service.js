@@ -18,11 +18,18 @@ class TicketsService {
   }
 
   sanitizeTicketData(ticketData = {}) {
-    return {
-      ...ticketData,
-      ticket_title: ticketData.ticket_title?.trim() || "",
-      ticket_description: ticketData.ticket_description?.trim() || null,
-    };
+    const sanitized = { ...ticketData };
+
+    if ("ticket_title" in sanitized) {
+      sanitized.ticket_title = sanitized.ticket_title?.trim() || "";
+    }
+
+    if ("ticket_description" in sanitized) {
+      sanitized.ticket_description =
+        sanitized.ticket_description?.trim() || null;
+    }
+
+    return sanitized;
   }
 
   validateRequiredFields(ticketData) {
@@ -110,7 +117,8 @@ class TicketsService {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas(sla_title, sla_hours)
       `,
       orderBy: "created_at",
       ascending: false,
@@ -132,7 +140,8 @@ class TicketsService {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas(sla_title, sla_hours)
       `,
     });
   }
@@ -170,7 +179,9 @@ class TicketsService {
 
     const createdTicket = await ticketsRepository.create(payload);
 
-    await ticketTrackingRepository.create(this.buildTrackingPayload(createdTicket));
+    await ticketTrackingRepository.create(
+      this.buildTrackingPayload(createdTicket)
+    );
 
     return createdTicket;
   }
@@ -212,16 +223,16 @@ class TicketsService {
     };
 
     if (
-      sanitizedData.ticket_title !== undefined &&
+      "ticket_title" in sanitizedData &&
       !mergedTicket.ticket_title?.trim()
     ) {
       throw new Error("ticket_title cannot be empty");
     }
 
     if (
-      sanitizedData.sla_id ||
-      sanitizedData.priority_id ||
-      sanitizedData.responsible_department_id
+      "sla_id" in sanitizedData ||
+      "priority_id" in sanitizedData ||
+      "responsible_department_id" in sanitizedData
     ) {
       await this.validateSlaConsistency(mergedTicket);
     }

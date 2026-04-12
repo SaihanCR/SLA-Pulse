@@ -6,6 +6,21 @@ class TicketTrackingRepository extends BaseRepository {
     super("ticket_tracking", "tracking_id");
   }
 
+  removeDuplicates(items = []) {
+    const seen = new Set();
+
+    return items.filter((item) => {
+      const key = `${item.tracking_id}-${item.created_at || ""}`;
+
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }
+
   async findByTicket(ticketId) {
     const { data, error } = await supabase
       .from(this.tableName)
@@ -17,7 +32,7 @@ class TicketTrackingRepository extends BaseRepository {
       throw new Error(`Error al buscar historial del ticket: ${error.message}`);
     }
 
-    return data;
+    return this.removeDuplicates(data || []);
   }
 
   async findByTicketDetailed(ticketId) {
@@ -47,11 +62,10 @@ class TicketTrackingRepository extends BaseRepository {
       .order("created_at", { ascending: true });
 
     if (error) {
-      // Fallback seguro al historial básico si el join no coincide exactamente
       return await this.findByTicket(ticketId);
     }
 
-    return data;
+    return this.removeDuplicates(data || []);
   }
 }
 

@@ -13,7 +13,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('company_id', companyId)
       .order('created_at', { ascending: false });
@@ -32,7 +33,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('status_id', statusId)
       .order('created_at', { ascending: false });
@@ -51,7 +53,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('priority_id', priorityId)
       .order('created_at', { ascending: false });
@@ -70,7 +73,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('responsible_department_id', departmentId)
       .order('created_at', { ascending: false });
@@ -89,7 +93,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('requester_department_id', departmentId)
       .order('created_at', { ascending: false });
@@ -108,7 +113,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .or(`ticket_code.ilike.%${term}%,ticket_title.ilike.%${term}%`)
       .order('created_at', { ascending: false });
@@ -127,7 +133,8 @@ class TicketsRepository extends BaseRepository {
         *,
         companies(company_name),
         priorities(priority_name),
-        ticket_statuses(status_name)
+        ticket_statuses(status_name),
+        slas:slas!tickets_sla_id_fkey(sla_title, sla_hours)
       `)
       .eq('ticket_id', ticketId)
       .single();

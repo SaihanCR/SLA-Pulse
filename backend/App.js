@@ -12,6 +12,7 @@ import ticketsRoutes from "./src/routes/tickets.routes.js";
 import authRoutes from "./src/routes/auth.routes.js"
 import alertsRoutes from "./src/routes/alerts.routes.js"
 import ticketTrackingRoutes from "./src/routes/ticketTracking.routes.js";
+import ticketStatusesRoutes from "./src/routes/ticketStatuses.routes.js";
 import aiRoutes from "./src/routes/ai.routes.js";
 
 
@@ -31,6 +32,7 @@ app.use("/api/tickets", ticketsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/alerts", alertsRoutes);
 app.use("/api/ticket-tracking", ticketTrackingRoutes);
+app.use("/api/ticket-statuses", ticketStatusesRoutes);
 app.use("/api/ai", aiRoutes);
 
 app.get('/', (req, res) => {
@@ -59,5 +61,6 @@ app.listen(PORT, () => {
   console.log(`   Auth  http://localhost:${PORT}/api/auth`)
   console.log(`   Alerts  http://localhost:${PORT}/api/alerts`)
   console.log(`   Ticket Tracking  http://localhost:${PORT}/api/ticket-tracking`)
+  console.log(`   Ticket Statuses  http://localhost:${PORT}/api/ticket-statuses`)
   console.log(`   AI Chat  http://localhost:${PORT}/api/ai/chat`)
 });
