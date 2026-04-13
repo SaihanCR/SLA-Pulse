@@ -16,6 +16,17 @@ class UsersRepository extends BaseRepository {
     return !!data;
   }
 
+  async getUserByNameOrLastName(name) {
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select('*')
+      .or(`first_name.ilike.%${name}%,last_name.ilike.%${name}%`);
+    if (error) {
+      throw new Error(error.message);
+    }
+    return data;
+  }
+
 
 }
 

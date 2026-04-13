@@ -18,8 +18,14 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const response = await login(form.user_email, form.user_psw);
+
       localStorage.setItem("token", response.data.session.access_token);
       localStorage.setItem("userRole", response.data.user.role);
+      localStorage.setItem("userCompany", response.data.user.company_id);
+      localStorage.setItem("userDepartment", response.data.user.department_id);
+
+
+
       navigate("/companies");
     } catch (err) {
       setError(err.response?.data?.message || "Credenciales incorrectas");
@@ -85,12 +91,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-gray-500">
+        {/* <p className="mt-6 text-center text-xs text-gray-500">
           Don't have an account?{" "}
           <Link to="/register" className="text-purple-400 hover:text-purple-300">
             Register
           </Link>
-        </p>
+        </p> */}
 
       </div>
     </div>

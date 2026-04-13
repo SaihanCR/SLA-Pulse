@@ -12,18 +12,21 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  LayoutDashboard,
 } from "lucide-react";
-import { logout } from "../../services/auth.service";
+import { logout, isAdmin } from "../../services/auth.service";
 
-const mainMenuItems = [
+const adminMenuItems = [
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Companies", path: "/companies", icon: Building2 },
-  { name: "SLAs",      path: "/slas",      icon: Layers    },
-  { name: "Users",     path: "/users",     icon: Users     },
-  { name: "Roles",     path: "/roles",     icon: Shield    },
+  { name: "SLAs",      path: "/slas",      icon: Layers },
+  { name: "Users",     path: "/users",     icon: Users },
+  { name: "Roles",     path: "/roles",     icon: Shield },
 ];
 
 const ticketMenuItems = [
-  { name: "View Tickets", path: "/tickets", icon: FolderKanban },
+  { name: "View Tickets",  path: "/tickets",        icon: FolderKanban },
+  { name: "Create Ticket", path: "/tickets/create", icon: PlusCircle },
 ];
 
 const Sidebar = () => {
@@ -32,6 +35,9 @@ const Sidebar = () => {
 
   const [collapsed, setCollapsed]     = useState(false);
   const [ticketsOpen, setTicketsOpen] = useState(false);
+
+  // Leemos el rol una sola vez al montar el componente
+  const userIsAdmin = isAdmin();
 
   const isTicketsSectionActive = location.pathname.startsWith("/tickets");
 
@@ -46,6 +52,7 @@ const Sidebar = () => {
       console.error(error);
     } finally {
       localStorage.removeItem("token");
+      localStorage.removeItem("role"); // limpiamos el rol también
       navigate("/login");
     }
   };
@@ -104,10 +111,12 @@ const Sidebar = () => {
 
       {/* Menu */}
       <nav className="relative flex flex-1 flex-col gap-2 px-3 py-4">
-        {mainMenuItems.map(renderNavItem)}
 
-        {/* Tickets dropdown */}
-        <div className="mt-2">
+        {/* Items de admin — solo visibles si es administrador */}
+        {userIsAdmin && adminMenuItems.map(renderNavItem)}
+
+        {/* Tickets dropdown — visible para todos */}
+        <div className={userIsAdmin ? "mt-2" : ""}>
           <button
             onClick={() => setTicketsOpen((prev) => !prev)}
             title={collapsed ? "Tickets" : ""}
