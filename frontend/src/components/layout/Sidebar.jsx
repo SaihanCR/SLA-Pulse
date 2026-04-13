@@ -23,8 +23,7 @@ const mainMenuItems = [
 ];
 
 const ticketMenuItems = [
-  { name: "View Tickets",  path: "/tickets",        icon: FolderKanban },
-  { name: "Create Ticket", path: "/tickets/create", icon: PlusCircle   },
+  { name: "View Tickets", path: "/tickets", icon: FolderKanban },
 ];
 
 const Sidebar = () => {

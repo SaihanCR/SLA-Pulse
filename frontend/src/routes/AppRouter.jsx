@@ -4,13 +4,13 @@ import { isAuthenticated, isAdmin } from "../services/auth.service";
 
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
-import DepartmentsPage from "../pages/DepartmentsPage";
+//import DepartmentsPage from "../pages/DepartmentsPage";
 import SlasPage from "../pages/SlasPage";
 import CompaniesPage from "../pages/CompaniesPage";
 import UsersPage from "../pages/UsersPage";
 import RolesPage from "../pages/RolesPage";
 import TicketsPage from "../pages/TicketsPage";
-import CreateTicketPage from "../pages/CreateTicketPage";
+//import CreateTicketPage from "../pages/CreateTicketPage";
 
 // Si NO hay sesión deja pasar, si HAY sesión manda al inicio
 function PublicRoute({ children }) {
@@ -64,7 +64,7 @@ const AppRouter = () => {
           {/* rutas de usuario común */}
 
           <Route path="tickets" element={<TicketsPage />} />
-          <Route path="tickets/create" element={<CreateTicketPage />} />
+          {/* <Route path="tickets/create" element={<CreateTicketPage />} /> */}
         </Route>
 
       </Routes>
