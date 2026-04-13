@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  Building2,
+  Plus,
+  Pencil,
+  Trash2,
+  Layers,
+  X,
+} from "lucide-react";
 
 import {
   getCompanies,
@@ -14,359 +22,280 @@ import {
   deleteDepartment,
 } from "../services/departments.service";
 
+const emptyForm = {
+  company_name: "",
+  company_description: "",
+  is_active: true,
+};
+
+const emptyDeptForm = {
+  department_name: "",
+};
+
 const CompaniesPage = () => {
   const [companies, setCompanies] = useState([]);
-
-  const [form, setForm] = useState({
-    company_name: "",
-    company_description: "",
-    is_active: true,
-  });
-
+  const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const [departments, setDepartments] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const [showDeptModal, setShowDeptModal] = useState(false);
 
-  // 🔥 NEW
-  const [deptForm, setDeptForm] = useState({
-    department_name: "",
-  });
-
+  const [deptForm, setDeptForm] = useState(emptyDeptForm);
   const [editingDeptId, setEditingDeptId] = useState(null);
 
-  // 🔄 Load companies
   const fetchCompanies = async () => {
-    try {
-      const res = await getCompanies();
-      setCompanies(res.data);
-    } catch (error) {
-      console.error(error);
-      alert("Error cargando companies");
-    }
+    const res = await getCompanies();
+    setCompanies(res.data);
   };
 
   useEffect(() => {
     fetchCompanies();
   }, []);
 
-  // 📝 Form change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
-    setForm({
-      ...form,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  // ➕ Create / ✏️ Update
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const cleanData = {
+    const payload = {
       company_name: form.company_name,
       company_description: form.company_description,
       is_active: form.is_active,
     };
 
-    try {
-      if (editingId) {
-        await updateCompany(editingId, cleanData);
-      } else {
-        await createCompany(cleanData);
-      }
-
-      resetForm();
-      fetchCompanies();
-    } catch (error) {
-      console.error(error);
-      alert("Error guardando empresa");
+    if (editingId) {
+      await updateCompany(editingId, payload);
+    } else {
+      await createCompany(payload);
     }
+
+    closeModal();
+    fetchCompanies();
   };
 
-  // ✏️ Edit
-  const handleEdit = (company) => {
-    setForm({
-      company_name: company.company_name || "",
-      company_description: company.company_description || "",
-      is_active: company.is_active ?? true,
-    });
-
-    setEditingId(company.company_id);
+  const handleEdit = (c) => {
+    setForm(c);
+    setEditingId(c.company_id);
+    setShowModal(true);
   };
 
-  // 🗑️ Delete
   const handleDelete = async (id) => {
     if (!confirm("¿Eliminar empresa?")) return;
-
-    try {
-      await deleteCompany(id);
-      fetchCompanies();
-    } catch (error) {
-      console.error(error);
-      alert("Error eliminando empresa");
-    }
+    await deleteCompany(id);
+    fetchCompanies();
   };
 
-  // 🔥 View Departments
-  const handleViewDepartments = async (companyId) => {
-    try {
-      setLoadingDepartments(true);
-      setSelectedCompany(companyId);
-
-      const res = await getDepartmentsByCompany(companyId);
-      setDepartments(res.data);
-    } catch (error) {
-      console.error(error);
-      alert("Error cargando departamentos");
-    } finally {
-      setLoadingDepartments(false);
-    }
-  };
-
-  // 🔥 DEPARTMENTS HANDLERS
-  const handleDeptChange = (e) => {
-    setDeptForm({
-      ...deptForm,
-      [e.target.name]: e.target.value,
-    });
+  const openDeptModal = async (companyId) => {
+    setSelectedCompany(companyId);
+    const res = await getDepartmentsByCompany(companyId);
+    setDepartments(res.data);
+    setShowDeptModal(true);
   };
 
   const handleDeptSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const payload = {
-        ...deptForm,
-        company_id: selectedCompany,
-      };
+    const payload = {
+      ...deptForm,
+      company_id: selectedCompany,
+    };
 
-      if (editingDeptId) {
-        await updateDepartment(editingDeptId, payload);
-      } else {
-        await createDepartment(payload);
-      }
-
-      setDeptForm({ department_name: "" });
-      setEditingDeptId(null);
-
-      handleViewDepartments(selectedCompany);
-    } catch (error) {
-      console.error(error);
-      alert("Error guardando departamento");
+    if (editingDeptId) {
+      await updateDepartment(editingDeptId, payload);
+    } else {
+      await createDepartment(payload);
     }
+
+    resetDeptForm();
+    openDeptModal(selectedCompany);
   };
 
-  const handleEditDept = (dept) => {
-    setDeptForm({
-      department_name: dept.department_name,
-    });
-
-    setEditingDeptId(dept.department_id);
+  const handleEditDept = (d) => {
+    setDeptForm(d);
+    setEditingDeptId(d.department_id);
   };
 
   const handleDeleteDept = async (id) => {
     if (!confirm("¿Eliminar departamento?")) return;
-
-    try {
-      await deleteDepartment(id);
-      handleViewDepartments(selectedCompany);
-    } catch (error) {
-      console.error(error);
-      alert("Error eliminando departamento");
-    }
+    await deleteDepartment(id);
+    openDeptModal(selectedCompany);
   };
 
-  const resetForm = () => {
-    setForm({
-      company_name: "",
-      company_description: "",
-      is_active: true,
-    });
+  const closeModal = () => {
+    setForm(emptyForm);
     setEditingId(null);
+    setShowModal(false);
+  };
+
+  const closeDeptModal = () => {
+    setDeptForm(emptyDeptForm);
+    setEditingDeptId(null);
+    setShowDeptModal(false);
+  };
+
+  const resetDeptForm = () => {
+    setDeptForm(emptyDeptForm);
+    setEditingDeptId(null);
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6 text-gray-800">
+    <div className="space-y-6">
 
-      <h2 className="text-3xl font-bold mb-6">Companies</h2>
-
-      {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-5 rounded-xl shadow-md mb-6 flex flex-col gap-4 max-w-lg"
-      >
-        <input
-          name="company_name"
-          placeholder="Company Name"
-          value={form.company_name}
-          onChange={handleChange}
-          className="border p-2 rounded focus:ring-2 focus:ring-purple-500 outline-none"
-          required
-        />
-
-        <textarea
-          name="company_description"
-          placeholder="Description"
-          value={form.company_description}
-          onChange={handleChange}
-          className="border p-2 rounded focus:ring-2 focus:ring-purple-500 outline-none"
-        />
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="is_active"
-            checked={form.is_active}
-            onChange={handleChange}
-          />
-          Active
-        </label>
-
-        <div className="flex gap-3">
-          <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition">
-            {editingId ? "Update" : "Create"}
-          </button>
-
-          {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="bg-gray-300 px-4 py-2 rounded"
-            >
-              Cancel
-            </button>
-          )}
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="bg-purple-600 p-2 rounded-xl text-white">
+            <Building2 size={20} />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Companies</h1>
+            <p className="text-sm text-gray-500">{companies.length} companies</p>
+          </div>
         </div>
-      </form>
+
+        <button
+          onClick={() => setShowModal(true)}
+          className="bg-purple-600 text-white px-4 py-2 rounded-xl flex gap-2 items-center"
+        >
+          <Plus size={16} />
+          New Company
+        </button>
+      </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-200 text-gray-700">
+          <thead className="bg-gray-100">
             <tr>
               <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Code</th>
-              <th className="p-3 text-left">Description</th>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Actions</th>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th></th>
             </tr>
           </thead>
 
           <tbody>
-            {companies.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center p-4">
-                  No companies found
+            {companies.map((c) => (
+              <tr key={c.company_id} className="border-t hover:bg-gray-50">
+                <td className="p-3 font-medium">{c.company_name}</td>
+                <td>{c.company_code}</td>
+                <td>{c.company_description}</td>
+
+                <td>
+                  {c.is_active ? (
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">
+                      Inactive
+                    </span>
+                  )}
+                </td>
+
+                <td className="flex gap-2 p-3">
+                  <button onClick={() => handleEdit(c)}>
+                    <Pencil size={16} />
+                  </button>
+
+                  <button onClick={() => handleDelete(c.company_id)}>
+                    <Trash2 size={16} />
+                  </button>
+
+                  <button onClick={() => openDeptModal(c.company_id)}>
+                    <Layers size={16} />
+                  </button>
                 </td>
               </tr>
-            ) : (
-              companies.map((c) => (
-                <tr key={c.company_id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{c.company_name}</td>
-                  <td className="p-3">{c.company_code}</td>
-                  <td className="p-3">{c.company_description}</td>
-                  <td className="p-3">
-                    {c.is_active ? "🟢 Active" : "🔴 Inactive"}
-                  </td>
-
-                  <td className="p-3 flex gap-3 flex-wrap">
-                    <button
-                      onClick={() => handleEdit(c)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(c.company_id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      Delete
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        handleViewDepartments(c.company_id)
-                      }
-                      className="text-purple-600 hover:underline"
-                    >
-                      Departments
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* DEPARTMENTS */}
-      {selectedCompany && (
-        <div className="mt-6 bg-white p-5 rounded-xl shadow-md">
+      {/* COMPANY MODAL */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <div className="flex justify-between mb-4">
+              <h3>{editingId ? "Edit Company" : "New Company"}</h3>
+              <button onClick={closeModal}>
+                <X />
+              </button>
+            </div>
 
-          <h3 className="text-lg font-bold mb-4">
-            Departments
-          </h3>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <input
+                name="company_name"
+                placeholder="Name"
+                value={form.company_name}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
 
-          {/* FORM */}
-          <form
-            onSubmit={handleDeptSubmit}
-            className="flex gap-3 mb-4"
-          >
-            <input
-              name="department_name"
-              placeholder="Department Name"
-              value={deptForm.department_name}
-              onChange={handleDeptChange}
-              className="border p-2 rounded w-full"
-              required
-            />
+              <textarea
+                name="company_description"
+                placeholder="Description"
+                value={form.company_description}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
 
-            <button className="bg-purple-600 text-white px-4 rounded">
-              {editingDeptId ? "Update" : "Add"}
-            </button>
-          </form>
+              <button className="bg-purple-600 text-white w-full p-2 rounded">
+                Save
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
-          {/* LIST */}
-          {loadingDepartments ? (
-            <p>Loading...</p>
-          ) : departments.length === 0 ? (
-            <p>No departments found</p>
-          ) : (
-            <ul className="space-y-2">
-              {departments.map((d) => (
-                <li
-                  key={d.department_id}
-                  className="flex justify-between items-center border p-2 rounded bg-gray-50"
-                >
-                  <span>
-                    {d.department_name} ({d.department_code})
-                  </span>
+      {/* DEPARTMENT MODAL */}
+      {showDeptModal && (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
 
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleEditDept(d)}
-                      className="text-blue-600"
-                    >
-                      Edit
-                    </button>
+            <div className="flex justify-between mb-4">
+              <h3>Departments</h3>
+              <button onClick={closeDeptModal}>
+                <X />
+              </button>
+            </div>
 
-                    <button
-                      onClick={() =>
-                        handleDeleteDept(d.department_id)
-                      }
-                      className="text-red-600"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+            <form onSubmit={handleDeptSubmit} className="flex gap-2 mb-4">
+              <input
+                name="department_name"
+                value={deptForm.department_name}
+                onChange={(e) =>
+                  setDeptForm({ department_name: e.target.value })
+                }
+                className="border p-2 flex-1 rounded"
+              />
+              <button className="bg-purple-600 text-white px-3 rounded">
+                Add
+              </button>
+            </form>
+
+            {departments.map((d) => (
+              <div key={d.department_id} className="flex justify-between mb-2">
+                <span>{d.department_name}</span>
+
+                <div className="flex gap-2">
+                  <button onClick={() => handleEditDept(d)}>
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={() => handleDeleteDept(d.department_id)}>
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+          </div>
         </div>
       )}
     </div>

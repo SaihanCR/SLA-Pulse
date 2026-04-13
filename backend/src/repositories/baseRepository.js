@@ -2,18 +2,26 @@ import supabase from '../config/supabase.js';
 
 class BaseRepository {
   constructor(tableName, idField = 'id') {
-    // Nombre de la tabla en Supabase
     this.tableName = tableName;
-
-    // Campo identificador primario
     this.idField = idField;
   }
 
-  async getAll() {
-    // Obtiene todos los registros de la tabla
-    const { data, error } = await supabase
+  async getAll(options = {}) {
+    const {
+      select = '*',
+      orderBy = null,
+      ascending = true,
+    } = options;
+
+    let query = supabase
       .from(this.tableName)
-      .select('*');
+      .select(select);
+
+    if (orderBy) {
+      query = query.order(orderBy, { ascending });
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Error al obtener registros de ${this.tableName}: ${error.message}`);
@@ -22,13 +30,18 @@ class BaseRepository {
     return data;
   }
 
-  async getById(id) {
-    // Obtiene un registro por su identificador
-    const { data, error } = await supabase
+  async getById(id, options = {}) {
+    const {
+      select = '*',
+    } = options;
+
+    let query = supabase
       .from(this.tableName)
-      .select('*')
+      .select(select)
       .eq(this.idField, id)
       .single();
+
+    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Error al obtener registro de ${this.tableName} por ID: ${error.message}`);
@@ -38,7 +51,6 @@ class BaseRepository {
   }
 
   async create(payload) {
-    // Inserta un nuevo registro
     const { data, error } = await supabase
       .from(this.tableName)
       .insert(payload)
@@ -53,7 +65,6 @@ class BaseRepository {
   }
 
   async update(id, payload) {
-    // Actualiza un registro existente por su identificador
     const { data, error } = await supabase
       .from(this.tableName)
       .update(payload)
@@ -69,7 +80,6 @@ class BaseRepository {
   }
 
   async delete(id) {
-    // Elimina un registro por su identificador
     const { data, error } = await supabase
       .from(this.tableName)
       .delete()

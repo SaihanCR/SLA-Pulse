@@ -1,7 +1,6 @@
-import ticketStatusesService from '../services/ticketStatuses.service.js';
+import ticketStatusesService from "../services/ticketStatuses.service.js";
 
 class TicketStatusesController {
-
   async getAll(req, res) {
     try {
       const data = await ticketStatusesService.getAllStatuses();
