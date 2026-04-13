@@ -1,9 +1,8 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "../Layout/Sidebar";
+import Chatbot from "../Chatbot/Chatbot";
 
 const Layout = () => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
       <div className="flex min-h-screen">
@@ -17,6 +16,9 @@ const Layout = () => {
           </div>
         </main>
       </div>
+
+      {/* Chatbot global */}
+      <Chatbot />
     </div>
   );
 };
