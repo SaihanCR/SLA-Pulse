@@ -1,4 +1,6 @@
 import supabase from '../config/supabase.js';
+import usersRepository from '../repositories/users.repository.js';
+import roleRepository from '../repositories/roles.repository.js';
 
 class authService {
 
@@ -38,12 +40,27 @@ class authService {
             throw new Error('Error logging in: ' + error.message)
         }
 
-        console.log('access token:', data.session.access_token)
-        console.log('user id:', data.user.id)
-        console.log('user email:', data.user.email)
-        console.log('last log in:', data.user.last_sign_in_at)
+        const userData = await usersRepository.getById(data.user.id, {select: 'role_id'});
 
-        return data
+        const userRole = await roleRepository.getById(userData.role_id, {select: 'role_name'});
+
+         if (!userData) {
+            throw new Error('Error fetching user data: User not found')
+        }
+
+        if (!userRole) {
+            throw new Error('Error fetching user role: Role not found')
+        }
+       
+        return {
+            session: data.session,
+            user: {
+                id: data.user.id,
+                email: data.user.email,
+                role: userRole.role_name,
+                // departamento y compania 
+            }
+        }
     }
 
     async logOut() {
