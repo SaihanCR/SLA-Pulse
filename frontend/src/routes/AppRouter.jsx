@@ -11,6 +11,7 @@ import UsersPage from "../pages/UsersPage";
 import RolesPage from "../pages/RolesPage";
 import TicketsPage from "../pages/TicketsPage";
 import CreateTicketPage from "../pages/CreateTicketPage";
+import DashboardPage from "../pages/DashboardPage";
 
 // Si NO hay sesión deja pasar, si HAY sesión manda al inicio
 function PublicRoute({ children }) {
@@ -47,6 +48,11 @@ const AppRouter = () => {
           <PrivateRoute><Layout /></PrivateRoute>
         }>
           {/* rutas de administrador */}
+
+          <Route path="dashboard" element={
+            <AdminRoute><DashboardPage /></AdminRoute>
+          } />
+
           <Route index path="companies" element={
             <AdminRoute><CompaniesPage /></AdminRoute>
           } />
