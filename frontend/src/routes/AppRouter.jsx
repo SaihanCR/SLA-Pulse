@@ -2,29 +2,29 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import { isAuthenticated, isAdmin } from "../services/auth.service";
 
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
+import LoginPage      from "../pages/LoginPage";
+import SlasPage       from "../pages/SlasPage";
+import DepartmentsPage from "../pages/DepartmentsPage";
+import CompaniesPage  from "../pages/CompaniesPage";
+import UsersPage      from "../pages/UsersPage";
+import RolesPage      from "../pages/RolesPage";
+import TicketsPage    from "../pages/TicketsPage";
+import DashboardPage  from "../pages/DashboardPage";
 
-import SlasPage from "../pages/SlasPage";
-import CompaniesPage from "../pages/CompaniesPage";
-import UsersPage from "../pages/UsersPage";
-import RolesPage from "../pages/RolesPage";
-import TicketsPage from "../pages/TicketsPage";
-import DashboardPage from "../pages/DashboardPage";
-
-//  RUTA PÚBLICA
+// Con sesión → redirige, sin sesión → deja pasar
 function PublicRoute({ children }) {
   return isAuthenticated() ? <Navigate to="/tickets" /> : children;
 }
 
-//  RUTA PRIVADA
+// Sin sesión → login, con sesión → deja pasar
 function PrivateRoute({ children }) {
   return isAuthenticated() ? children : <Navigate to="/login" />;
 }
 
-//  TEMPORAL (DESARROLLO)
-//  NO bloquea por admin mientras pruebas
+// Sin sesión → login, no es admin → tickets, es admin → deja pasar
 function AdminRoute({ children }) {
+  if (!isAuthenticated()) return <Navigate to="/login" />;
+  if (!isAdmin())         return <Navigate to="/tickets" />;
   return children;
 }
 
@@ -33,46 +33,32 @@ const AppRouter = () => {
     <BrowserRouter>
       <Routes>
 
-        {/*  Rutas públicas */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
+        {/* Ruta pública */}
+        <Route path="/login" element={
+          <PublicRoute><LoginPage /></PublicRoute>
+        } />
 
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <RegisterPage />
-            </PublicRoute>
-          }
-        />
+        {/* Rutas privadas — dentro del Layout */}
+        <Route path="/" element={
+          <PrivateRoute><Layout /></PrivateRoute>
+        }>
 
-        {/*  Rutas privadas */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }
-        >
-          {/*  REDIRECCIÓN POR DEFECTO */}
-          <Route index element={<Navigate to="/tickets" />} />
+          {/* Ruta raíz: admin va a dashboard, el resto a tickets */}
+          <Route index element={
+            isAdmin() ? <Navigate to="/dashboard" /> : <Navigate to="/tickets" />
+          } />
 
-          {/* Admin (temporalmente abiertas) */}
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="companies" element={<CompaniesPage />} />
-          <Route path="slas" element={<SlasPage />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="roles" element={<RolesPage />} />
+          {/* Solo admin */}
+          <Route path="dashboard"   element={<AdminRoute><DashboardPage /></AdminRoute>} />
+          <Route path="companies"   element={<AdminRoute><CompaniesPage /></AdminRoute>} />
+          <Route path="departments" element={<AdminRoute><DepartmentsPage /></AdminRoute>} />
+          <Route path="slas"        element={<AdminRoute><SlasPage /></AdminRoute>} />
+          <Route path="users"       element={<AdminRoute><UsersPage /></AdminRoute>} />
+          <Route path="roles"       element={<AdminRoute><RolesPage /></AdminRoute>} />
 
-          {/* Usuario */}
+          {/* Todos los roles */}
           <Route path="tickets" element={<TicketsPage />} />
+
         </Route>
 
       </Routes>

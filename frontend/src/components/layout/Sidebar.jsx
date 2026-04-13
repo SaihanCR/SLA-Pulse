@@ -14,18 +14,18 @@ import {
   LogOut,
   LayoutDashboard,
 } from "lucide-react";
-import { logout } from "../../services/auth.service";
+import { logout, isAdmin } from "../../services/auth.service";
 
-const mainMenuItems = [
+const adminMenuItems = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Companies", path: "/companies", icon: Building2 },
-  { name: "SLAs", path: "/slas", icon: Layers },
-  { name: "Users", path: "/users", icon: Users },
-  { name: "Roles", path: "/roles", icon: Shield },
+  { name: "SLAs",      path: "/slas",      icon: Layers },
+  { name: "Users",     path: "/users",     icon: Users },
+  { name: "Roles",     path: "/roles",     icon: Shield },
 ];
 
 const ticketMenuItems = [
-  { name: "View Tickets", path: "/tickets", icon: FolderKanban },
+  { name: "View Tickets",  path: "/tickets",        icon: FolderKanban },
   { name: "Create Ticket", path: "/tickets/create", icon: PlusCircle },
 ];
 
@@ -33,8 +33,11 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed]     = useState(false);
   const [ticketsOpen, setTicketsOpen] = useState(false);
+
+  // Leemos el rol una sola vez al montar el componente
+  const userIsAdmin = isAdmin();
 
   const isTicketsSectionActive = location.pathname.startsWith("/tickets");
 
@@ -49,6 +52,7 @@ const Sidebar = () => {
       console.error(error);
     } finally {
       localStorage.removeItem("token");
+      localStorage.removeItem("role"); // limpiamos el rol también
       navigate("/login");
     }
   };
@@ -61,17 +65,19 @@ const Sidebar = () => {
         to={item.path}
         title={collapsed ? item.name : ""}
         className={({ isActive }) =>
-          `group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-300 ${isActive
-            ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-900/30"
-            : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
+          `group relative flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-300 ${
+            isActive
+              ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-900/30"
+              : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
           }`
         }
       >
         <div className="shrink-0">
           <Icon size={18} />
         </div>
-        <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
-          }`}>
+        <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+          collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+        }`}>
           {item.name}
         </span>
       </NavLink>
@@ -79,8 +85,9 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className={`relative flex min-h-screen flex-col border-r border-gray-800 bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-200 shadow-2xl transition-all duration-300 ${collapsed ? "w-24" : "w-72"
-      }`}>
+    <aside className={`relative flex min-h-screen flex-col border-r border-gray-800 bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-200 shadow-2xl transition-all duration-300 ${
+      collapsed ? "w-24" : "w-72"
+    }`}>
 
       {/* Glow decor */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-purple-600/10 blur-3xl" />
@@ -88,8 +95,9 @@ const Sidebar = () => {
 
       {/* Header */}
       <div className="relative flex items-center justify-between border-b border-gray-800 px-4 py-5">
-        <div className={`transition-all duration-300 ${collapsed ? "w-0 opacity-0 overflow-hidden" : "opacity-100"
-          }`}>
+        <div className={`transition-all duration-300 ${
+          collapsed ? "w-0 opacity-0 overflow-hidden" : "opacity-100"
+        }`}>
           <h2 className="text-2xl font-bold tracking-wide text-white">SLA Pulse</h2>
           <p className="text-sm text-gray-400">Dashboard</p>
         </div>
@@ -103,40 +111,46 @@ const Sidebar = () => {
 
       {/* Menu */}
       <nav className="relative flex flex-1 flex-col gap-2 px-3 py-4">
-        {mainMenuItems.map(renderNavItem)}
 
-        {/* Tickets dropdown */}
-        <div className="mt-2">
+        {/* Items de admin — solo visibles si es administrador */}
+        {userIsAdmin && adminMenuItems.map(renderNavItem)}
+
+        {/* Tickets dropdown — visible para todos */}
+        <div className={userIsAdmin ? "mt-2" : ""}>
           <button
             onClick={() => setTicketsOpen((prev) => !prev)}
             title={collapsed ? "Tickets" : ""}
-            className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-300 ${isTicketsSectionActive
+            className={`group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-300 ${
+              isTicketsSectionActive
                 ? "bg-purple-600/15 text-white ring-1 ring-purple-500/30"
                 : "text-gray-300 hover:bg-gray-800/80 hover:text-white"
-              }`}
+            }`}
           >
             <div className="shrink-0">
               <Ticket size={18} />
             </div>
-            <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
-              }`}>
+            <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+              collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+            }`}>
               Tickets
             </span>
             {!collapsed && (
               <ChevronDown
                 size={16}
-                className={`ml-auto transition-transform duration-300 ${ticketsOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`ml-auto transition-transform duration-300 ${
+                  ticketsOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             )}
           </button>
 
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${collapsed
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            collapsed
               ? "max-h-0 opacity-0"
               : ticketsOpen
-                ? "mt-2 max-h-40 opacity-100"
-                : "max-h-0 opacity-0"
-            }`}>
+              ? "mt-2 max-h-40 opacity-100"
+              : "max-h-0 opacity-0"
+          }`}>
             <div className="ml-4 flex flex-col gap-2 border-l border-gray-700 pl-4">
               {ticketMenuItems.map((item) => {
                 const Icon = item.icon;
@@ -145,9 +159,10 @@ const Sidebar = () => {
                     key={item.name}
                     to={item.path}
                     className={({ isActive }) =>
-                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-300 ${isActive
-                        ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-md"
-                        : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                      `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-300 ${
+                        isActive
+                          ? "bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-md"
+                          : "text-gray-400 hover:bg-gray-800 hover:text-white"
                       }`
                     }
                   >
@@ -168,14 +183,16 @@ const Sidebar = () => {
         <button
           onClick={handleLogout}
           title={collapsed ? "Sign out" : ""}
-          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-gray-400 transition-all duration-300 hover:bg-red-500/10 hover:text-red-400 ${collapsed ? "justify-center" : ""
-            }`}
+          className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-gray-400 transition-all duration-300 hover:bg-red-500/10 hover:text-red-400 ${
+            collapsed ? "justify-center" : ""
+          }`}
         >
           <div className="shrink-0">
             <LogOut size={18} />
           </div>
-          <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
-            }`}>
+          <span className={`whitespace-nowrap text-sm font-medium transition-all duration-300 ${
+            collapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100"
+          }`}>
             Sign out
           </span>
         </button>
