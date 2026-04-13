@@ -1,12 +1,10 @@
 // src/pages/UsersPage.jsx
 import { useEffect, useState } from "react";
 import { Users, UserPlus, Pencil, Trash2, X } from "lucide-react";
-import {
-  getAllUsers,
-  createUser,
-  updateUser,
-  deleteUser,
-} from "../services/user.service.js";
+import { getAllUsers, createUser, updateUser, deleteUser } from "../services/user.service.js";
+import { getCompanies } from "../services/companies.service.js";
+import { getDepartmentsByCompany } from "../services/departments.service.js";
+import { getRoles } from "../services/roles.service.js";
 
 const emptyForm = {
   first_name: "",
@@ -21,12 +19,18 @@ const emptyForm = {
 };
 
 const UsersPage = () => {
-  const [users, setUsers]         = useState([]);
-  const [form, setForm]           = useState(emptyForm);
-  const [editingId, setEditingId] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading]     = useState(false);
+  const [users, setUsers]             = useState([]);
+  const [form, setForm]               = useState(emptyForm);
+  const [editingId, setEditingId]     = useState(null);
+  const [showModal, setShowModal]     = useState(false);
+  const [loading, setLoading]         = useState(false);
 
+  // Datos para los selects
+  const [companies, setCompanies]     = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [roles, setRoles]             = useState([]);
+
+  // ── Carga inicial ──────────────────────────────────────────
   const fetchUsers = async () => {
     try {
       const res = await getAllUsers();
@@ -37,10 +41,53 @@ const UsersPage = () => {
     }
   };
 
+  const fetchCompanies = async () => {
+    try {
+      const res = await getCompanies();
+      setCompanies(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const res = await getRoles();
+      setRoles(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchCompanies();
+    fetchRoles();
   }, []);
 
+  // ── Cuando cambia company_id, carga sus departamentos ──────
+  useEffect(() => {
+    if (!form.company_id) {
+      setDepartments([]);
+      setForm((prev) => ({ ...prev, department_id: "" }));
+      return;
+    }
+
+    const fetchDepartments = async () => {
+      try {
+        const res = await getDepartmentsByCompany(form.company_id);
+        setDepartments(res.data);
+        // Resetea el departamento seleccionado al cambiar de compañía
+        setForm((prev) => ({ ...prev, department_id: "" }));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchDepartments();
+  }, [form.company_id]); // se ejecuta cada vez que cambia company_id
+
+  // ── Handlers ───────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
@@ -98,8 +145,13 @@ const UsersPage = () => {
   const closeModal = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setDepartments([]);
     setShowModal(false);
   };
+
+  // ── Clases reutilizables ───────────────────────────────────
+  const inputClass = "w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100";
+  const selectClass = `${inputClass} bg-white cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400`;
 
   return (
     <div className="space-y-6">
@@ -115,7 +167,6 @@ const UsersPage = () => {
             <p className="text-sm text-gray-500">{users.length} registered users</p>
           </div>
         </div>
-
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-purple-900/30 transition-all hover:from-purple-700 hover:to-violet-700"
@@ -146,18 +197,13 @@ const UsersPage = () => {
               </tr>
             ) : (
               users.map((u) => (
-                <tr
-                  key={u.user_id}
-                  className="border-t border-gray-100 transition-colors hover:bg-gray-50"
-                >
+                <tr key={u.user_id} className="border-t border-gray-100 transition-colors hover:bg-gray-50">
                   <td className="p-4">
                     <span className="rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">
                       {u.int_cod_user}
                     </span>
                   </td>
-                  <td className="p-4 font-medium text-gray-800">
-                    {u.first_name} {u.last_name}
-                  </td>
+                  <td className="p-4 font-medium text-gray-800">{u.first_name} {u.last_name}</td>
                   <td className="p-4 text-gray-500">{u.job_title}</td>
                   <td className="p-4">
                     {u.is_active ? (
@@ -234,7 +280,7 @@ const UsersPage = () => {
                       value={form.first_name}
                       onChange={handleChange}
                       required
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                      className={inputClass}
                     />
                   </div>
                   <div className="space-y-1">
@@ -245,7 +291,7 @@ const UsersPage = () => {
                       value={form.last_name}
                       onChange={handleChange}
                       required
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                      className={inputClass}
                     />
                   </div>
                 </div>
@@ -259,7 +305,7 @@ const UsersPage = () => {
                     value={form.job_title}
                     onChange={handleChange}
                     required
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                    className={inputClass}
                   />
                 </div>
 
@@ -275,7 +321,7 @@ const UsersPage = () => {
                     value={form.user_email}
                     onChange={handleChange}
                     required={!editingId}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                    className={inputClass}
                   />
                 </div>
 
@@ -291,45 +337,71 @@ const UsersPage = () => {
                     value={form.user_psw}
                     onChange={handleChange}
                     required={!editingId}
-                    className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
+                    className={inputClass}
                   />
                 </div>
 
-                {/* IDs — en el futuro serán selects */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500">Company ID</label>
-                    <input
-                      name="company_id"
-                      placeholder="ID"
-                      value={form.company_id}
-                      onChange={handleChange}
-                      required
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500">Role ID</label>
-                    <input
-                      name="role_id"
-                      placeholder="ID"
-                      value={form.role_id}
-                      onChange={handleChange}
-                      required
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-500">Department ID</label>
-                    <input
-                      name="department_id"
-                      placeholder="ID"
-                      value={form.department_id}
-                      onChange={handleChange}
-                      required
-                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-purple-400 focus:ring-2 focus:ring-purple-100"
-                    />
-                  </div>
+                {/* Company select */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-500">Company</label>
+                  <select
+                    name="company_id"
+                    value={form.company_id}
+                    onChange={handleChange}
+                    required
+                    className={selectClass}
+                  >
+                    <option value="">Select a company...</option>
+                    {companies.map((c) => (
+                      <option key={c.company_id} value={c.company_id}>
+                        {c.company_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Department select — depende de company_id */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-500">
+                    Department
+                    {!form.company_id && (
+                      <span className="ml-1 text-gray-400">(select a company first)</span>
+                    )}
+                  </label>
+                  <select
+                    name="department_id"
+                    value={form.department_id}
+                    onChange={handleChange}
+                    required
+                    disabled={!form.company_id}  // bloqueado hasta que elijan compañía
+                    className={selectClass}
+                  >
+                    <option value="">Select a department...</option>
+                    {departments.map((d) => (
+                      <option key={d.department_id} value={d.department_id}>
+                        {d.department_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Role select */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-500">Role</label>
+                  <select
+                    name="role_id"
+                    value={form.role_id}
+                    onChange={handleChange}
+                    required
+                    className={selectClass}
+                  >
+                    <option value="">Select a role...</option>
+                    {roles.map((r) => (
+                      <option key={r.role_id} value={r.role_id}>
+                        {r.role_name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Active */}
@@ -358,7 +430,6 @@ const UsersPage = () => {
               </button>
               <button
                 type="submit"
-                form="user-form"
                 onClick={handleSubmit}
                 disabled={loading}
                 className="rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-900/20 transition hover:from-purple-700 hover:to-violet-700 disabled:opacity-60"
