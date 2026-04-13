@@ -7,13 +7,16 @@ export const getAllUsers = () =>
   axios.get(API);
 
 export const getUserById = (id) =>
-  axios.get(`${API}/${id}`);
+  axios.get(`${API}/id/${id}`);
 
 export const createUser = (data) =>
   axios.post(API, data);
   // data debe tener: { company_id, role_id, department_id,
   //                    first_name, last_name, job_title,
   //                    is_active, user_email, user_psw }
+
+  export const getUserByName = (name) =>
+  axios.get(`${API}/name/${name}`);
 
 export const updateUser = (id, data) =>
   axios.put(`${API}/${id}`, data);
