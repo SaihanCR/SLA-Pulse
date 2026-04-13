@@ -3,7 +3,7 @@ import Layout from "../components/layout/Layout";
 import { isAuthenticated, isAdmin } from "../services/auth.service";
 
 import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
+// import RegisterPage from "../pages/RegisterPage";
 //import DepartmentsPage from "../pages/DepartmentsPage";
 import SlasPage from "../pages/SlasPage";
 import CompaniesPage from "../pages/CompaniesPage";
@@ -38,9 +38,9 @@ const AppRouter = () => {
         <Route path="/login" element={
           <PublicRoute><LoginPage /></PublicRoute>
         } />
-        <Route path="/register" element={
+        {/* <Route path="/register" element={
           <PublicRoute><RegisterPage /></PublicRoute>
-        } />
+        } /> */}
 
         {/* Rutas privadas */}
         <Route path="/" element={
