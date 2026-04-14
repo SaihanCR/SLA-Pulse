@@ -44,36 +44,48 @@ class UserService {
         return await userRepository.create(payload)
     }
     async updateUser(userid, userData) {
-        if (!userData) {
-            throw new Error('User Data required')
+        if (!userData) throw new Error('User Data required')
+        if (!userid) throw new Error('User ID required')
+
+        const existingUser = await userRepository.getById(userid)
+        if (!existingUser) throw new Error('User not found')
+
+        // Construimos el payload solo con los campos que cambiaron
+        const payload = {}
+
+        // Campos simples — solo se incluyen si son diferentes
+        if (userData.last_name && userData.last_name !== existingUser.last_name) payload.last_name = userData.last_name
+
+        if (userData.job_title && userData.job_title !== existingUser.job_title) payload.job_title = userData.job_title
+
+        if (userData.company_id && userData.company_id !== existingUser.company_id) payload.company_id = userData.company_id
+
+        if (userData.role_id && userData.role_id !== existingUser.role_id) payload.role_id = userData.role_id
+
+        if (userData.department_id && userData.department_id !== existingUser.department_id) payload.department_id = userData.department_id
+        
+        if (userData.is_active !== undefined && userData.is_active !== existingUser.is_active) payload.is_active = userData.is_active
+
+        // Nombre — si cambia, normaliza y genera nuevo código
+        if (userData.first_name && userData.first_name.toUpperCase() !== existingUser.first_name) {
+            payload.first_name = userData.first_name.toUpperCase()
+            payload.int_cod_user = await this.genreateUserCode(payload.first_name)
         }
 
-        if (!userid) {
-            throw new Error('User ID required')
-        }
-
-        if (userData.first_name) {
-            userData.first_name = userData.first_name.toUpperCase()
-            userData.int_cod_user = await this.genreateUserCode(userData.first_name) // si se actualiza el nombre, generamos un nuevo codigo unico para el usuario
-        }
-
-        // actualizar el email y contraseña en supabase auth si se proporcionan
+        // Email y contraseña — se actualizan en Supabase Auth si vienen
         if (userData.user_email || userData.user_psw) {
             const authData = {}
-            if (userData.user_email) {
-                authData.email = userData.user_email
-            }
-            if (userData.user_psw) {
-                authData.password = userData.user_psw
-            }
+            if (userData.user_email) authData.email = userData.user_email
+            if (userData.user_psw) authData.password = userData.user_psw
             await authService.updateUser(userid, authData)
         }
 
-        // eliminamos los campos de email y contraseña del payload para no actualizar esos campos en la tabla users
-        delete userData.user_email
-        delete userData.user_psw
+        // Si no cambió nada en la tabla, no hacemos el UPDATE innecesario
+        if (Object.keys(payload).length === 0) {
+            return existingUser
+        }
 
-        return await userRepository.update(userid, userData)
+        return await userRepository.update(userid, payload)
     }
 
     async deleteUser(userId) {
