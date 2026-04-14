@@ -145,6 +145,24 @@ class TicketsRepository extends BaseRepository {
 
     return data;
   }
+
+  async getAllForAlerts() {
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select(`
+        ticket_id,
+        created_at,
+        sla_id,
+        priority_id,
+        ticket_statuses(status_name)
+      `);
+
+    if (error) {
+      throw new Error(`Error obteniendo tickets para alertas: ${error.message}`);
+    }
+
+    return data;
+  }
 }
 
 export default new TicketsRepository();

@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "../Layout/Sidebar";
+import Sidebar from "./Sidebar";
+import NotificationsBell from "../NotificationBell";
 
 const Layout = () => {
   return (
@@ -8,6 +9,10 @@ const Layout = () => {
         <Sidebar />
 
         <main className="flex-1 overflow-x-auto bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200">
+          {/* HEADER GLOBAL */}
+          <div className="flex justify-end p-4">
+            <NotificationsBell />
+          </div>
           <div className="min-h-screen p-6 md:p-8">
             <div className="mx-auto w-full max-w-[1600px]">
               <Outlet />

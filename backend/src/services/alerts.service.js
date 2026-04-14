@@ -5,107 +5,96 @@ import slasRepository from "../repositories/slas.repository.js";
 class AlertsService {
 
   async evaluateTicket(ticket) {
+    // Tomar el nombre del estado si viene expandido
+    const statusName =
+      ticket.ticket_statuses?.status_name ||
+      ticket.status_name ||
+      null;
 
-    console.log("------ EVALUANDO TICKET ------");
-    console.log("Ticket ID:", ticket.ticket_id);
+    // Estados que cierran la alerta
+    const closedStatuses = ["Finalizado", "Abandonado"];
+
+    // Si el ticket ya no está operativo, cerrar alertas y salir
+    if (closedStatuses.includes(statusName)) {
+      await alertsRepository.resolveByTicketAndSeverity(ticket.ticket_id, "high");
+      await alertsRepository.resolveByTicketAndSeverity(ticket.ticket_id, "medium");
+      return;
+    }
 
     const now = new Date();
     const createdAt = new Date(ticket.created_at);
 
-    // Obtener SLA
     const sla = await slasRepository.getById(ticket.sla_id);
-    console.log("SLA:", sla);
 
-    if (!sla) {
-      console.log("❌ SLA no encontrado");
-      return;
-    }
+    if (!sla) return;
 
-    const totalHours = sla.sla_hours;
-    console.log("Total Hours:", totalHours);
-
-    const totalMs = totalHours * 60 * 60 * 1000;
-
+    const totalMs = sla.sla_hours * 60 * 60 * 1000;
     const deadline = new Date(createdAt.getTime() + totalMs);
     const remainingMs = deadline - now;
-
     const threshold = totalMs * 0.3;
 
-    console.log("Remaining (ms):", remainingMs);
-    console.log("Threshold (ms):", threshold);
-
-    // 🔴 ALERTA CRÍTICA (SLA vencido)
+    // CRÍTICO
     if (remainingMs <= 0) {
-
-      console.log("🔥 SLA VENCIDO → ALERTA CRÍTICA");
-
       const existing = await alertsRepository.findActiveByTicketAndSeverity(
         ticket.ticket_id,
         "high"
       );
 
-      if (existing) {
-        console.log("⚠️ Ya existe alerta CRITICAL activa");
-        return;
+      if (!existing) {
+        await alertsRepository.create({
+          ticket_id: ticket.ticket_id,
+          priority_id: ticket.priority_id,
+          message: "SLA incumplido",
+          severity: "high",
+          status: "active",
+        });
       }
 
-      const alert = await alertsRepository.create({
-        ticket_id: ticket.ticket_id,
-        priority_id: ticket.priority_id,
-        message: "SLA incumplido",
-        severity: "high",
-        status: "active"
-      });
-
-      console.log("✅ ALERTA CRÍTICA CREADA:", alert);
-      return alert;
+      return;
     }
 
-    // 🟡 ALERTA WARNING (30%)
+    // WARNING
     if (remainingMs <= threshold) {
-
-      console.log("⚠️ SLA en 30% restante");
-
       const existing = await alertsRepository.findActiveByTicketAndSeverity(
         ticket.ticket_id,
         "medium"
       );
 
-      if (existing) {
-        console.log("⚠️ Ya existe alerta WARNING activa");
-        return;
+      if (!existing) {
+        await alertsRepository.create({
+          ticket_id: ticket.ticket_id,
+          priority_id: ticket.priority_id,
+          message: "El ticket está en su 30% final",
+          severity: "medium",
+          status: "active",
+        });
       }
 
-      const alert = await alertsRepository.create({
-        ticket_id: ticket.ticket_id,
-        priority_id: ticket.priority_id,
-        message: "El ticket está en su 30% final",
-        severity: "medium",
-        status: "active"
-      });
-
-      console.log("✅ ALERTA WARNING CREADA:", alert);
-      return alert;
+      await alertsRepository.resolveByTicketAndSeverity(ticket.ticket_id, "high");
+      return;
     }
 
-    console.log("ℹ️ No cumple condición de alerta");
-  }
+    // NORMAL → cerrar todo
+    await alertsRepository.resolveByTicketAndSeverity(ticket.ticket_id, "high");
+    await alertsRepository.resolveByTicketAndSeverity(ticket.ticket_id, "medium");
+}
 
   async runEngine() {
-
-    console.log("========== EJECUTANDO ALERT ENGINE ==========");
-
-    const tickets = await ticketsRepository.getAll();
-
-    console.log("Tickets encontrados:", tickets.length);
+    const tickets = await ticketsRepository.getAllForAlerts();
 
     for (const ticket of tickets) {
       await this.evaluateTicket(ticket);
     }
 
-    console.log("========== FIN ALERT ENGINE ==========");
-
     return { message: "Alert Engine ejecutado" };
+  }
+
+  async getActiveAlerts() {
+    return await alertsRepository.getActiveAlerts();
+  }
+
+  async getAllAlerts() {
+    return await alertsRepository.getAllAlerts();
   }
 }
 
