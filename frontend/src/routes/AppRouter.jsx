@@ -2,14 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import { isAuthenticated, isAdmin } from "../services/auth.service";
 
-import LoginPage      from "../pages/LoginPage";
-import SlasPage       from "../pages/SlasPage";
+import LoginPage from "../pages/LoginPage";
+import SlasPage from "../pages/SlasPage";
 import DepartmentsPage from "../pages/DepartmentsPage";
-import CompaniesPage  from "../pages/CompaniesPage";
-import UsersPage      from "../pages/UsersPage";
-import RolesPage      from "../pages/RolesPage";
-import TicketsPage    from "../pages/TicketsPage";
-import DashboardPage  from "../pages/DashboardPage";
+import CompaniesPage from "../pages/CompaniesPage";
+import UsersPage from "../pages/UsersPage";
+import RolesPage from "../pages/RolesPage";
+import TicketsPage from "../pages/TicketsPage";
+import DashboardPage from "../pages/DashboardPage";
 
 // Con sesión → redirige, sin sesión → deja pasar
 function PublicRoute({ children }) {
@@ -24,7 +24,7 @@ function PrivateRoute({ children }) {
 // Sin sesión → login, no es admin → tickets, es admin → deja pasar
 function AdminRoute({ children }) {
   if (!isAuthenticated()) return <Navigate to="/login" />;
-  if (!isAdmin())         return <Navigate to="/tickets" />;
+  if (!isAdmin()) return <Navigate to="/tickets" />;
   return children;
 }
 
@@ -49,15 +49,15 @@ const AppRouter = () => {
           } />
 
           {/* Solo admin */}
-          <Route path="dashboard"   element={<AdminRoute><DashboardPage /></AdminRoute>} />
-          <Route path="companies"   element={<AdminRoute><CompaniesPage /></AdminRoute>} />
+          <Route path="companies" element={<AdminRoute><CompaniesPage /></AdminRoute>} />
           <Route path="departments" element={<AdminRoute><DepartmentsPage /></AdminRoute>} />
-          <Route path="slas"        element={<AdminRoute><SlasPage /></AdminRoute>} />
-          <Route path="users"       element={<AdminRoute><UsersPage /></AdminRoute>} />
-          <Route path="roles"       element={<AdminRoute><RolesPage /></AdminRoute>} />
+          <Route path="slas" element={<AdminRoute><SlasPage /></AdminRoute>} />
+          <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
+          <Route path="roles" element={<AdminRoute><RolesPage /></AdminRoute>} />
 
           {/* Todos los roles */}
           <Route path="tickets" element={<TicketsPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
 
         </Route>
 
