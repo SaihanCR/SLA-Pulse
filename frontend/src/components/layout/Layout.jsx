@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import NotificationsBell from "../NotificationBell";
+import Chatbot from "../Chatbot/Chatbot";
 
 const Layout = () => {
   return (
@@ -20,6 +21,9 @@ const Layout = () => {
           </div>
         </main>
       </div>
+
+      {/* Chatbot global */}
+      <Chatbot />
     </div>
   );
 };

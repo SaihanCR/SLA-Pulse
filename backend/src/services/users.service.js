@@ -7,12 +7,14 @@ class UserService {
         return await userRepository.getAll()
     }
 
-    async getUsers() {
-        return await userRepository.getAll()
-    }
     async getUserByid(userid) {
 
         return await userRepository.getById(userid)
+    }
+
+    async getUserByName(name) {
+
+        return await userRepository.getUserByNameOrLastName(name)
     }
 
     async createUser(userData) {

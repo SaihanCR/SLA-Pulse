@@ -20,6 +20,15 @@ class userController {
         }
     }
 
+    async getByName(req, res) {
+        try {
+            const data = await usersService.getUserByName(req.params.name)
+            res.status(200).json(data)
+        } catch (error) {
+            res.status(404).json({ message: error.message });
+        }
+    }
+
     async create(req, res) {
         try {
             const data = await usersService.createUser(req.body)
