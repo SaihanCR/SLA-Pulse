@@ -15,6 +15,8 @@ import ticketTrackingRoutes from "./src/routes/ticketTracking.routes.js";
 import ticketStatusesRoutes from "./src/routes/ticketStatuses.routes.js";
 import aiRoutes from "./src/routes/ai.routes.js";
 import dashboardRoutes from "./src/routes/Dashboard.routes.js";
+import ticketOptionsRoutes from "./src/routes/ticketOptions.routes.js";
+
 
 const app = express();
 app.use(cors());
@@ -35,6 +37,7 @@ app.use("/api/ticket-tracking", ticketTrackingRoutes);
 app.use("/api/ticket-statuses", ticketStatusesRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/ticket-options", ticketOptionsRoutes);
 
 app.get('/', (req, res) => {
   res.send('API en funcionamiento... Se a conectado correctamente con Supabase');
@@ -65,4 +68,5 @@ app.listen(PORT, () => {
   console.log(`   Ticket Statuses  http://localhost:${PORT}/api/ticket-statuses`)
   console.log(`   AI Chat  http://localhost:${PORT}/api/ai/chat`)
   console.log(`   Dashboard Overview  http://localhost:${PORT}/api/dashboard/overview`)
+  console.log(`   Ticket Options  http://localhost:${PORT}/api/ticket-options/options`)
 });
